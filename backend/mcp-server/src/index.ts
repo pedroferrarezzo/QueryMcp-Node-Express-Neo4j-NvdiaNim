@@ -16,7 +16,7 @@ const neo4jRepository = new Neo4jRepository(getNeo4jDriver());
 const emailClient = new NodeMailerClient(getNodeMailerTransporter(), ENV.EMAIL_FROM);
 
 const sessionManager = new MCPSessionManager({
-    schema: { name: "querymcp-server", version: "1.0.0" },
+    schema: { name: "query-mcp-server", version: "1.0.0" },
     registerToolsFunc: registerTools,
     dbRepository: neo4jRepository,
     emailClient: emailClient,
@@ -27,7 +27,7 @@ const controller = new MCPController(sessionManager);
 app.use("/", createMcpRouter(controller));
 
 app.listen(ENV.MCP_SERVER_PORT, () => {
-    console.log(`MCP server running on port ${ENV.MCP_SERVER_PORT}`);
+    console.log(`MCP server running on ${ENV.MCP_SERVER_ENDPOINT} and port ${ENV.MCP_SERVER_PORT}`);
 });
 
 process.on("SIGINT", async () => {

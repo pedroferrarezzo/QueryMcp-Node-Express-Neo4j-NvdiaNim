@@ -32,13 +32,11 @@ async function start() {
   const app = express();
   app.use(express.json());
 
-  app.use("/");
-
   const { mcpClient, tools } = await initializeMcpClient();
   const llm = initializeLangchain();
 
   const server = app.listen(ENV.MCP_CLIENT_PORT, () => {
-    console.log(`MCP client running on port ${ENV.MCP_CLIENT_PORT}`);
+    console.log(`MCP client running on ${ENV.MCP_CLIENT_WS_ENDPOINT} and port ${ENV.MCP_CLIENT_PORT}`);
   });
 
   const wss = new WebSocketServer({
@@ -60,5 +58,6 @@ async function start() {
 }
 
 start().catch((err) => {
+  console.error("Error starting MCP client:", err);
   process.exit(1);
 });

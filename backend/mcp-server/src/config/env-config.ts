@@ -12,7 +12,10 @@ const envSchema = z.object({
   NEO4J_PASSWORD: z.string(),
   EMAIL_HOST: z.string(),
   EMAIL_PORT: z.coerce.number(),
-  EMAIL_SECURE: z.coerce.boolean(),
+  EMAIL_SECURE: z.preprocess(
+    (val) => val === "true" || val === "True" ? true : val === "false" || val === "False" ? false : val,
+    z.boolean()
+  ),
   EMAIL_USER: z.string(),
   EMAIL_PASS: z.string(),
   EMAIL_FROM: z.email(),
