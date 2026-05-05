@@ -21,7 +21,7 @@ async function initializeMcpClient() {
  * Inicializa o cliente Langchain.
  */
 function initializeLangchain() {
-  const llm = createLangchainClient(ENV.GEMINI_API_KEY, ENV.GEMINI_MODEL);
+  const llm = createLangchainClient(ENV.LLM_API_KEY, ENV.LLM_MODEL, ENV.LLM_BASE_URL);
   return llm;
 }
 

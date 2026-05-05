@@ -1,0 +1,13 @@
+MCP_SERVER_ENDPOINT=/mcp/query
+MCP_SERVER_PORT=3005
+
+NEO4J_URI=bolt://localhost:7688
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=querymcp
+
+EMAIL_HOST=localhost
+EMAIL_PORT=1026
+EMAIL_SECURE=False
+EMAIL_USER=querymcp
+EMAIL_PASS=querymcp
+EMAIL_FROM=mcpserver@querymcp.com.br

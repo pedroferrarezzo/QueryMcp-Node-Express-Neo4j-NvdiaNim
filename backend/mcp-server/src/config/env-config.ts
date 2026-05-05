@@ -2,16 +2,16 @@ import "dotenv/config";
 import { z } from "zod";
 
 const envSchema = z.object({
-  MCP_SERVER_ENDPOINT: z.string().default("/mcp"),
+  MCP_SERVER_ENDPOINT: z.string().min(1, "MCP server endpoint is required").default("/mcp"),
   MCP_SERVER_PORT: z
     .coerce
     .number()
     .default(3001),
   NEO4J_URI: z.url(),
-  NEO4J_USER: z.string(),
-  NEO4J_PASSWORD: z.string(),
-  EMAIL_HOST: z.string(),
-  EMAIL_PORT: z.coerce.number(),
+  NEO4J_USER: z.string().min(1, "NEO4J_USER is required"),
+  NEO4J_PASSWORD: z.string().min(1, "NEO4J_PASSWORD is required"),
+  EMAIL_HOST: z.string().min(1, "EMAIL_HOST is required"),
+  EMAIL_PORT: z.coerce.number().min(1, "EMAIL_PORT is required"),
   EMAIL_SECURE: z.preprocess(
     (val) => val === "true" || val === "True" ? true : val === "false" || val === "False" ? false : val,
     z.boolean()

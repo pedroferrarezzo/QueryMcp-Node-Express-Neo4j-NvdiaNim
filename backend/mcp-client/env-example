@@ -1,0 +1,10 @@
+MCP_CLIENT_WS_ENDPOINT=/chat
+MCP_CLIENT_PORT=3004
+
+QUERY_MCP_SERVER_ENDPOINT=http://localhost:3005/mcp/query
+
+LLM_API_KEY=xxxxxxxxxxxxxx
+# https://docs.api.nvidia.com/nim/reference/z-ai-glm4-7
+# https://medium.com/coding-nexus/nvidia-is-offering-80-ai-models-for-free-via-apis-fc64b38276b8
+LLM_MODEL=z-ai/glm4.7
+LLM_BASE_URL=https://integrate.api.nvidia.com/v1

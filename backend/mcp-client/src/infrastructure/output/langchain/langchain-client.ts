@@ -1,18 +1,23 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
 
 /**
- * Cria um modelo de linguagem usando o Google Gemini.
- * @param apiKey Chave de API do Google Gemini
- * @param modelName Nome do modelo Gemini
- * @returns {ChatGoogleGenerativeAI} O modelo de linguagem criado.
+ * Cria um modelo de linguagem.
+ * @param apiKey Chave de API 
+ * @param modelName Nome do modelo
+ * @param baseURL URL base para a API
+ * @returns {ChatOpenAI} O modelo de linguagem configurado.
  */
 export function createLangchainClient(
   apiKey: string,
-  modelName: string
-): ChatGoogleGenerativeAI {
-  return new ChatGoogleGenerativeAI({
-    apiKey: apiKey,
-    model: modelName,
+  modelName: string,
+  baseURL: string
+): ChatOpenAI {
+  return new ChatOpenAI({
+    modelName: modelName,
+    configuration: {
+      baseURL: baseURL,
+      apiKey: apiKey
+    },
     temperature: 0,
   });
 }
