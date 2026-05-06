@@ -15,6 +15,10 @@
       height: 100vh;
     }
 
+    :root {
+      --primary-color: #2563eb;
+    }
+
     #header {
       padding: 12px;
       background: #020617;
@@ -44,12 +48,15 @@
 
     .user {
       align-self: flex-end;
-      background: #2563eb;
+      background: var(--primary-color);
     }
 
     .bot {
       align-self: flex-start;
       background: #1e293b;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
     }
 
     #input-area {
@@ -73,14 +80,42 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      background: #22c55e;
-      color: black;
+      background: var(--primary-color);
+      color: white;
       font-weight: bold;
     }
 
     button:disabled {
       background: #475569;
       cursor: not-allowed;
+    }
+
+    .streaming-text {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      font-family: sans-serif;
+    }
+
+    .dots {
+      display: inline-flex;
+      gap: 3px;
+    }
+
+    .dots span {
+      width: 4px;
+      height: 4px;
+      background-color: currentColor;
+      border-radius: 50%;
+      animation: jump 1.2s infinite ease-in-out;
+    }
+
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes jump {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
   </style>
 </head>
@@ -116,10 +151,28 @@
       statusEl.style.color = color;
     }
 
+    function createLoadingDots() {
+      const container = document.createElement('span');
+      container.classList.add('dots');
+      
+      for (let i = 0; i < 3; i++) {
+        const dot = document.createElement('span');
+        container.appendChild(dot);
+      }
+      
+      return container;
+    }
+
     function addMessage(content, type) {
       const el = document.createElement("div");
       el.className = `message ${type}`;
       el.textContent = content;
+
+      if (isStreaming && type === "bot") {
+        const loadingDots = createLoadingDots();
+        el.appendChild(loadingDots);
+      }
+
       chat.appendChild(el);
       chat.scrollTop = chat.scrollHeight;
       return el;
@@ -151,22 +204,39 @@
           switch (data.type) {
 
             case "chunk":
-              if (!currentBotMessageEl) {
-                currentBotMessageEl = addMessage("", "bot");
+              if (currentBotMessageEl.firstChild && currentBotMessageEl.firstChild.nodeType === 3) {
+                  currentBotMessageEl.firstChild.textContent += data.content;
+              } else {
+                currentBotMessageEl.prepend(document.createTextNode(data.content));
               }
-              currentBotMessageEl.textContent += data.content;
+
               chat.scrollTop = chat.scrollHeight;
               break;
 
             case "end":
               isStreaming = false;
+
+              const loadingDots = currentBotMessageEl.querySelector(".dots");
+              if (loadingDots) {
+                loadingDots.remove();
+              }
+
               currentBotMessageEl = null;
               break;
 
             case "error":
+              const errorMessage = data.message ? `Erro: ${data.message}` : "Ocorreu um erro desconhecido.";
+
+              if (currentBotMessageEl) {
+                  currentBotMessageEl.textContent = errorMessage;
+                  currentBotMessageEl = null;
+              }
+              else {
+                addMessage(errorMessage, "bot");
+              }
+
               isStreaming = false;
-              addMessage("Erro: " + data.message, "bot");
-              currentBotMessageEl = null;
+
               break;
 
             default:
@@ -189,7 +259,7 @@
       addMessage(text, "user");
 
       isStreaming = true;
-      currentBotMessageEl = null;
+      currentBotMessageEl = addMessage("", "bot");
 
       socket.send(JSON.stringify({
         prompt: text
