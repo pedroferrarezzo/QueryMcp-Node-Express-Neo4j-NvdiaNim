@@ -23,6 +23,7 @@ export function registerTools(
     "Retorna o schema do banco de dados",
     {},
     async () => {
+      console.debug("Tool 'get_db_schema' called. Fetching database schema...");
       const schema = await deps.dbRepository.getSchema();
 
       return {
@@ -47,6 +48,7 @@ export function registerTools(
       params: z.record(z.string(), z.any()).optional(),
     },
     async ({ query, params }) => {
+      console.debug("Tool 'execute_query' called. Executing query: ", query, " with params: ", params);
       const result = await deps.dbRepository.executeQuery(query, params);
 
       return {
@@ -72,6 +74,7 @@ export function registerTools(
       body: z.string(),
     },
     async ({ to, subject, body }) => {
+      console.debug("Tool 'send_email' called. Sending email to: ", to);
       await deps.emailClient.sendEmail(to, subject, body);
 
       return {

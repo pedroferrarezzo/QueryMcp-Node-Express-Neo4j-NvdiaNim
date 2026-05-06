@@ -20,8 +20,12 @@ export class MCPController {
                 return res.status(401).json({ error: "Invalid session" });
             }
 
+            console.debug("Handling POST request for existing session: ", sessionId);
+
             return session.streamableHttpTransport.handleRequest(req, res, req.body);
         }
+
+        console.debug("Creating new session for request");
 
         const session = await this.sessionManager.createSession();
         return session.streamableHttpTransport?.handleRequest(req, res, req.body);
@@ -38,6 +42,8 @@ export class MCPController {
         if (!session?.streamableHttpTransport) {
             return res.status(401).json({ error: "Invalid session" });
         }
+
+        console.debug("Handling GET request for existing session: ", sessionId);
 
         return session.streamableHttpTransport.handleRequest(req, res, req.body);
     }

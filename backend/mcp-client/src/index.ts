@@ -37,6 +37,9 @@ async function start() {
 
   const server = app.listen(ENV.MCP_CLIENT_PORT, () => {
     console.log(`MCP client running on ${ENV.MCP_CLIENT_WS_ENDPOINT} and port ${ENV.MCP_CLIENT_PORT}`);
+    console.log(`Using LLM model ${ENV.LLM_MODEL} with base URL ${ENV.LLM_BASE_URL}`);
+    console.log(`Connected to MCP server at ${ENV.QUERY_MCP_SERVER_ENDPOINT}`);
+    console.log(`Available MCP tools: ${tools.map((t) => t.name).join(", ")}`);
   });
 
   const wss = new WebSocketServer({
