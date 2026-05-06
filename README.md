@@ -6,12 +6,12 @@ Plataforma de chatbot para exposição de um agente de IA que consome ferramenta
 <div align="center">
 	<a href="#visao-geral">Visão Geral</a> •
 	<a href="#recursos-principais">Recursos Principais</a> •
-	<a href="#apis">APIs</a> •
-		<a href="#tecnologias">Tecnologias</a> •
-		<a href="#estrutura-do-projeto">Estrutura do Projeto</a> •
+	<a href="#ferramentas">APIs e Ferramentas</a> •
+    <a href="#tecnologias">Tecnologias</a> •
+    <a href="#estrutura-do-projeto">Estrutura do Projeto</a> •
 	<a href="#arquitetura">Arquitetura</a> •
 	<a href="#llm">LLM</a> •
-		<a href="#principios-solid-aplicados">Princípios SOLID Aplicados</a> •
+    <a href="#principios-solid-aplicados">Princípios SOLID Aplicados</a> •
 	<a href="#fluxos-rag">Fluxos RAG</a> •
 	<a href="#infraestrutura-local">Infraestrutura Local</a> •
 	<a href="#instalacao-e-uso">Instalação e Uso</a> •
@@ -23,6 +23,8 @@ Plataforma de chatbot para exposição de um agente de IA que consome ferramenta
 ---
 
 ## 📋 Visão Geral
+
+<a id="visao-geral"></a>
 
 O QueryMCP conecta um chatbot a um agente de IA capaz de consumir ferramentas via MCP, simplificando consultas, automações e exploração de dados em uma interface conversacional.
 
@@ -37,6 +39,8 @@ O projeto é dividido em dois componentes principais:
 
 ## 🚀 Recursos Principais
 
+<a id="recursos-principais"></a>
+
 - ✅ **Servidor MCP com Transporte HTTP Streamable**: Implementação completa da especificação MCP para comunicação entre clientes e servidores
 - ✅ **Gerenciamento de Sessões**: Cada cliente mantém uma sessão isolada com o servidor MCP
 - ✅ **Tool Calling com LLM**: Integração com modelos de IA que suportam chamada de ferramentas
@@ -48,9 +52,103 @@ O projeto é dividido em dois componentes principais:
 
 ---
 
-## 🔌 APIs
+## ⛏️ APIs e Ferramentas
+
+### WebSocket Client API
+
+O cliente envia e recebe mensagens via WebSocket:
+
+**Mensagem de Entrada:**
+```json
+{
+	"type": "query",
+	"content": "Qual é o schema do banco de dados?"
+}
+```
+
+**Mensagens de Saída:**
+```json
+{
+	"type": "chunk",
+	"content": "Parte da resposta..."
+}
+```
+
+```json
+{
+	"type": "end"
+}
+```
+
+```json
+{
+	"type": "error",
+	"message": "Descrição do erro"
+}
+```
+
+### MCP Server HTTP Routes
+
+O servidor MCP expõe as seguintes rotas HTTP para comunicação com clientes MCP:
+
+#### POST `{MCP_SERVER_ENDPOINT}`
+
+Processa requisições MCP e executa as ferramentas solicitadas.
+
+**Middleware:**
+- `extractSessionId` - Extrai o ID da sessão da requisição (opcional)
+
+**Mensagem de Entrada:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "method": "tools/call",
+  "params": {
+    "name": "query_database",
+    "arguments": {
+      "sql": "SELECT * FROM users LIMIT 5"
+    }
+  }
+}
+```
+
+**Mensagens de Saída (Content-Type JSON ou Event Stream):**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "[{\"id\": 1, \"name\": \"Alice\"}, {\"id\": 2, \"name\": \"Bob\"}]"
+      }
+    ],
+    "isError": false
+  }
+}
+```
+
+#### GET `{MCP_SERVER_ENDPOINT}`
+
+Para envio de solicitações ou atualizações espontâneas ao cliente sem esperar por um novo POST.
+
+**Middleware:**
+- `extractSessionId` - Extrai o ID da sessão (obrigatório)
+- `requireSessionId` - Valida que o ID da sessão foi fornecido (obrigatório)
+
+**Mensagens de Saída (Content-Type Event Stream):**
+```json
+{
+    "jsonrpc":"2.0",
+    "method":"notifications/initialized"
+}
+```
 
 ### MCP Server Tools
+
+<a id="ferramentas"></a>
 
 O servidor MCP expõe as seguintes ferramentas:
 
@@ -119,42 +217,11 @@ Envia um e-mail através do servidor de e-mails configurado.
 }
 ```
 
-### WebSocket Client API
-
-O cliente envia e recebe mensagens via WebSocket:
-
-**Mensagem de Entrada:**
-```json
-{
-	"type": "query",
-	"content": "Qual é o schema do banco de dados?"
-}
-```
-
-**Mensagens de Saída:**
-```json
-{
-	"type": "chunk",
-	"content": "Parte da resposta..."
-}
-```
-
-```json
-{
-	"type": "end"
-}
-```
-
-```json
-{
-	"type": "error",
-	"message": "Descrição do erro"
-}
-```
-
 ---
 
 ## 🛠️ Tecnologias
+
+<a id="tecnologias"></a>
 
 ### Backend - MCP Server
 - **Node.js** - Runtime JavaScript
@@ -187,6 +254,8 @@ O cliente envia e recebe mensagens via WebSocket:
 
 ## 🤖 LLM
 
+<a id="llm"></a>
+
 O projeto utiliza LLMs disponibilizados gratuitamente pela **NVIDIA** com suporte a **tool calling**, neste caso, o modelo **GLM4-7**.
 
 Mesmo que os modelos não pertencem à OpenAI, o cliente LangChain utilizado aqui é o pacote **@langchain/openai** porque ele implementa uma interface para APIs no formato OpenAI-compatible. Na prática, isso permite reaproveitar a classe `ChatOpenAI` com uma `baseURL` personalizada apontando para a NVIDIA, sem alterar o restante da cadeia de orquestração.
@@ -199,6 +268,8 @@ Mesmo que os modelos não pertencem à OpenAI, o cliente LangChain utilizado aqu
 ---
 
 ## 📁 Estrutura do Projeto
+
+<a id="estrutura-do-projeto"></a>
 
 ```
 QueryMCP/
@@ -258,6 +329,8 @@ QueryMCP/
 
 ## 🏗️ Arquitetura
 
+<a id="arquitetura"></a>
+
 ```mermaid
 graph TB
 		FE["🌐 Frontend (HTML/WebSocket)"]
@@ -310,6 +383,8 @@ graph TB
 
 ## 🎯 Princípios SOLID Aplicados
 
+<a id="principios-solid-aplicados"></a>
+
 ### **S** - Single Responsibility Principle
 
 Cada classe possui uma única responsabilidade bem definida:
@@ -347,6 +422,8 @@ Classes de alto nível não dependem de implementações concretas:
 ---
 
 ## 🔄 Fluxos RAG
+
+<a id="fluxos-rag"></a>
 
 ### O que é RAG?
 
@@ -407,6 +484,8 @@ Pode executar mais queries para refinar
 
 ## 🐳 Infraestrutura Local
 
+<a id="infraestrutura-local"></a>
+
 ### Serviços Docker Compose
 
 O projeto inclui um `docker-compose.yaml` que orquestra:
@@ -433,6 +512,8 @@ MCP Server e MCP Client possuem health checks configurados:
 ---
 
 ## 🚀 Instalação e Uso
+
+<a id="instalacao-e-uso"></a>
 
 ### Pré-requisitos
 
@@ -533,6 +614,8 @@ Basta abrir o arquivo [index.html](frontend/index.html)
 
 ## ⚙️ Configuração de Ambiente
 
+<a id="configuracao-de-ambiente"></a>
+
 
 > ⚠️ **Nunca commit** suas variáveis de ambiente com valores reais. Use os arquivos `env-example` como template.
 
@@ -601,6 +684,8 @@ Use `backend/mcp-client/env-example` quando quiser executar apenas o cliente loc
 
 ## 📝 Débitos Técnicos e Melhorias
 
+<a id="debitos-tecnicos-e-melhorias"></a>
+
 - [ ] Implementar testes de integração para ferramentas MCP
 - [ ] Adicionar observabilidade
 - [ ] Melhorar logging com logs canônicos
@@ -608,6 +693,7 @@ Use `backend/mcp-client/env-example` quando quiser executar apenas o cliente loc
 - [ ] Implementar cache de schemas e queries frequentes
 - [ ] Adicionar suporte ao MCP Transport `stdio` para que o MCP Server possa ser consumido diretamente via `stdin` e `stdout`
 - [ ] Adicionar suporte a diferentes LLMs via `Strategy Pattern` + `Factory Pattern`
+- [ ] Validação do fluxo de envio de mensagens assíncronas via endpoint `GET`
 
 ### Problemas Conhecidos
 
@@ -619,6 +705,8 @@ Use `backend/mcp-client/env-example` quando quiser executar apenas o cliente loc
 ---
 
 ## 🤝 Contribuição
+
+<a id="contribuicao"></a>
 
 ### Como Contribuir
 
