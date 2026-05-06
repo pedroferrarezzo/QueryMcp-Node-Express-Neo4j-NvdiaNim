@@ -10,10 +10,10 @@ let driver: Driver;
 export const getNeo4jDriver = () => {
   if (!driver) {
     driver = neo4j.driver(
-      ENV.NEO4J_URI,
+      ENV.URI_NEO4J,
       neo4j.auth.basic(
-        ENV.NEO4J_USER,
-        ENV.NEO4J_PASSWORD
+        ENV.USER_NEO4J,
+        ENV.PASSWORD_NEO4J
       )
     );
   }

@@ -25,6 +25,8 @@ services:
       wait
       "
     restart: unless-stopped
+    networks:
+      - query-mcp-network
 
   maildev:
     image: maildev/maildev:latest
@@ -33,7 +35,71 @@ services:
       - "1080:1080" # Web UI
       - "${MAILDEV_SMTP_PORT}:1025" # SMTP
     restart: unless-stopped
+    networks:
+      - query-mcp-network
+
+  mcp-server:
+    build:
+      context: ../backend/mcp-server
+      dockerfile: docker/Dockerfile
+    container_name: mcp-server
+    ports:
+      - "${MCP_SERVER_PORT}:${MCP_SERVER_PORT}"
+    environment:
+      - MCP_SERVER_ENDPOINT=${MCP_SERVER_ENDPOINT}
+      - MCP_SERVER_PORT=${MCP_SERVER_PORT}
+      - URI_NEO4J=${URI_NEO4J}
+      - USER_NEO4J=${USER_NEO4J}
+      - PASSWORD_NEO4J=${PASSWORD_NEO4J}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_SECURE=${EMAIL_SECURE}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - EMAIL_FROM=${EMAIL_FROM}
+    depends_on:
+      - neo4j
+      - maildev
+    restart: unless-stopped
+    networks:
+      - query-mcp-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:${MCP_SERVER_PORT}', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  mcp-client:
+    build:
+      context: ../backend/mcp-client
+      dockerfile: docker/Dockerfile
+    container_name: mcp-client
+    ports:
+      - "${MCP_CLIENT_PORT}:${MCP_CLIENT_PORT}"
+    environment:
+      - MCP_CLIENT_WS_ENDPOINT=${MCP_CLIENT_WS_ENDPOINT}
+      - MCP_CLIENT_PORT=${MCP_CLIENT_PORT}
+      - QUERY_MCP_SERVER_ENDPOINT=${QUERY_MCP_SERVER_ENDPOINT}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL}
+      - LLM_BASE_URL=${LLM_BASE_URL}
+    depends_on:
+      - mcp-server
+    restart: unless-stopped
+    networks:
+      - query-mcp-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:${MCP_CLIENT_PORT}', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
   neo4j_data:
   neo4j_logs:
+
+networks:
+  query-mcp-network:
+    driver: bridge

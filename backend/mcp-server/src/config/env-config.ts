@@ -7,9 +7,9 @@ const envSchema = z.object({
     .coerce
     .number()
     .default(3001),
-  NEO4J_URI: z.url(),
-  NEO4J_USER: z.string().min(1, "NEO4J_USER is required"),
-  NEO4J_PASSWORD: z.string().min(1, "NEO4J_PASSWORD is required"),
+  URI_NEO4J: z.url(),
+  USER_NEO4J: z.string().min(1, "USER_NEO4J is required"),
+  PASSWORD_NEO4J: z.string().min(1, "PASSWORD_NEO4J is required"),
   EMAIL_HOST: z.string().min(1, "EMAIL_HOST is required"),
   EMAIL_PORT: z.coerce.number().min(1, "EMAIL_PORT is required"),
   EMAIL_SECURE: z.preprocess(
