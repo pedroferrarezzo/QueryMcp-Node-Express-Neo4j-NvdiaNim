@@ -22,6 +22,8 @@ Plataforma de chatbot para exposição de um agente de IA que consome ferramenta
 
 ---
 
+https://github.com/user-attachments/assets/ed7fd38f-948e-4b36-8e2b-db489fb3914d
+
 ## 📋 Visão Geral
 
 <a id="visao-geral"></a>
