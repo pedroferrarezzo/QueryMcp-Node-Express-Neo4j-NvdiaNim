@@ -22,8 +22,6 @@ Plataforma de chatbot para exposição de um agente de IA que consome ferramenta
 
 ---
 
-https://github.com/user-attachments/assets/ed7fd38f-948e-4b36-8e2b-db489fb3914d
-
 ## 📋 Visão Geral
 
 <a id="visao-geral"></a>
@@ -34,6 +32,8 @@ O projeto é dividido em dois componentes principais:
 
 - **MCP Server**: Servidor que expõe ferramentas para interagir com um banco de dados Neo4j, enviar e-mails e gerenciar sessões de contexto
 - **MCP Client**: Cliente que consome as ferramentas disponibilizadas pelo servidor e as integra com um agente Langchain, comunicando-se via WebSocket com um frontend
+
+https://github.com/user-attachments/assets/ed7fd38f-948e-4b36-8e2b-db489fb3914d
 
 > ℹ️ Esta implementação segue a especificação **Streamable HTTP** do Model Context Protocol. Para mais detalhes, consulte: https://modelcontextprotocol.io/specification/2025-03-26/basic/transports
 
